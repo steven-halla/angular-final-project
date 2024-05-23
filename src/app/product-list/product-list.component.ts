@@ -18,9 +18,19 @@ export class ProductListComponent implements OnInit {
       const cat: string | null = paramMap.get('cat');
       console.log('Category from route:', cat);
 
-      this.products = this.service.getProductsByCategory(cat ?? undefined);
-      this.service.filteredProducts = this.products; // Initialize filtered products
-      console.log('Filtered products:', this.products);
+      if (cat) {
+        this.service.setFilteredProductsByCategory(cat);
+      } else {
+        this.service.filteredProducts$.subscribe(filteredProducts => {
+          this.products = filteredProducts;
+        });
+      }
+    });
+
+    // Always subscribe to the filtered products
+    this.service.filteredProducts$.subscribe(filteredProducts => {
+      this.products = filteredProducts;
+      console.log('Updated products:', this.products);
     });
   }
 }

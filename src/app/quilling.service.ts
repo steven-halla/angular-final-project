@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import * as data from './data.json';
 import { Product } from './product';
-import { ShoppingCartProduct } from './shopping-cart';
+import { BehaviorSubject } from 'rxjs';
 import { ShoppingCart } from './top-menu/ShoppingCart';
 
 @Injectable({
@@ -9,23 +9,20 @@ import { ShoppingCart } from './top-menu/ShoppingCart';
 })
 export class QuillingService {
   categories = [
-    'Animal',
-    'Baby',
-    'Birthday',
-    'Congratulation',
-    'Graduation',
-    'Holidays',
-    'Nature',
-    'Scenery',
-    'Thank you'
+    'Animal', 'Baby', 'Birthday', 'Congratulation', 'Graduation',
+    'Holidays', 'Nature', 'Scenery', 'Thank you'
   ];
 
   products: Product[] = (data as any).default;
-  filteredProducts: Product[] = [];
+  private filteredProductsSubject = new BehaviorSubject<Product[]>([]);
+  filteredProducts$ = this.filteredProductsSubject.asObservable();
   shoppingCart: ShoppingCart = new ShoppingCart();
   total: number = 0;
 
-  constructor() {}
+  constructor() {
+    // Initialize with all products
+    this.filteredProductsSubject.next(this.products);
+  }
 
   shuffleArray = (array: Array<any>) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -36,24 +33,23 @@ export class QuillingService {
   }
 
   addProduct = (product: Product) => {
-    //Your code is here
+    // Your code is here
   }
 
   removeProduct = (product: Product) => {
-    //Your code is here
+    // Your code is here
   }
 
   getNewCount = () => {
-    //Your code is here
+    // Your code is here
   }
 
   removeAllProducts = (id: string) => {
-    //Your code is here
+    // Your code is here
   }
 
   getTotalCost = () => {
-    //Your code is here
-    //Make sure to replace the 0 with your actual code
+    // Your code is here
     return 0;
   }
 
@@ -62,5 +58,20 @@ export class QuillingService {
       return this.products.filter(product => product.category === category);
     }
     return this.products;
+  }
+
+  setFilteredProducts(searchVal: string): void {
+    const filtered = this.products.filter((product: Product) =>
+        product.name.toLowerCase().includes(searchVal.toLowerCase()));
+    this.filteredProductsSubject.next(filtered);
+  }
+
+  resetFilteredProducts(): void {
+    this.filteredProductsSubject.next(this.products);
+  }
+
+  setFilteredProductsByCategory(category: string): void {
+    const filtered = this.getProductsByCategory(category);
+    this.filteredProductsSubject.next(filtered);
   }
 }

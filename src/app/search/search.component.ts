@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Product } from '../product';
 import { QuillingService } from '../quilling.service';
 
 @Component({
@@ -10,7 +9,6 @@ import { QuillingService } from '../quilling.service';
 })
 export class SearchComponent implements OnInit {
 
-  products: Product[] = [];
   searchVal: string = '';
   service: QuillingService;
 
@@ -18,13 +16,19 @@ export class SearchComponent implements OnInit {
     this.service = service;
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  search = () => { // 
-    this.service.filteredProducts = this.service.products.filter((product:Product) => product.name.toLowerCase().includes(this.searchVal.toLowerCase()));
+  search = () => {
+    if (this.searchVal.trim()) {
+      this.service.setFilteredProducts(this.searchVal);
+    } else {
+      this.service.resetFilteredProducts();
+    }
     this.searchVal = '';
-    this.router.navigate(['category']);
-  }
 
+    // Navigate to category after ensuring filtered products are set
+    setTimeout(() => {
+      this.router.navigate(['category']);
+    }, 100);
+  }
 }
